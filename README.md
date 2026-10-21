@@ -1,95 +1,106 @@
-# HOMER Motif Audit — GitHub preview (v0.3.0-rc2)
+# HOMER Motif Audit
 
-**Owner-review release candidate only. No public repository has been created or authorized for upload by this package.**
+**Auditable, conservative HOMER motif-name annotation and restricted TF-name-to-JASPAR 2026 metadata crosswalk**  
+Version: **v0.3.0-rc2** (release candidate)
 
-A small, offline, Python-standard-library command-line tool for **auditable, provisional HOMER motif-name annotations** and **restricted TF-name to JASPAR 2026 class/family metadata crosswalks**.
+HOMER Motif Audit is a small, offline Python command-line utility for interpreting **existing** HOMER known-motif enrichment result tables. It preserves the input records, derives provisional reporting labels from documented name rules, attaches a limited JASPAR 2026 TF-name/class/family crosswalk for explicitly allowed TF symbols, flags ambiguous cases for review, and records provenance and interpretation limits.
 
-**This is not a PWM alignment, motif de-duplication, TF occupancy, binding validation, or a novel biological TF-family classifier.** Even a supported TF-name match does not establish that the HOMER and JASPAR models share a PWM. User-supplied reference labels are not independently authenticated.
+**Scope:** This is *textual motif-name annotation*, **not** PWM/PFM alignment, motif discovery, sequence-based motif classification, motif de-duplication, TF occupancy determination, proof of direct binding, or independent biological validation. Reference metadata associated with a TF name must not be interpreted as evidence that a HOMER motif and a JASPAR motif have identical binding matrices.
 
 ## Requirements
 
-- Python 3.10 or later (runtime requires only the standard library; other versions not yet validated for this preview).
-- A HOMER `knownResults.txt` file or a tab-separated table containing motif names.
-- HOMER itself and internet access are **not required** to annotate an existing file.
+- Python **3.10+**; the runtime uses only Python's standard library. GitHub Actions tests Python 3.10 and 3.12.
+- A HOMER `knownResults.txt` or tab-separated table containing a motif-name column. For significance summaries, a numeric q-value column is required.
+- No installed HOMER executable, internet connection, or JASPAR download is required **for annotation of an existing table**.
 
 ## Quick start
 
-From the project directory:
+Run in the project root (on Windows, use `python` instead of `python3` if appropriate):
 
 ```bash
-python3 -B -m homer_audit.cli annotate \
+python -B -m homer_audit.cli annotate \
   --input examples/synthetic_knownResults.txt \
   --input-format homer-known \
   --outdir demo-output \
   --summary --q-threshold 0.05
 ```
 
-Choose a fresh output directory. The CLI refuses to replace existing output files unless you explicitly pass `--overwrite`.
-
-General TSV example:
+Generic tabular input with optional grouping:
 
 ```bash
-python3 -B -m homer_audit.cli annotate \
+python -B -m homer_audit.cli annotate \
   --input examples/synthetic_motifs.tsv \
   --input-format generic-tsv \
   --outdir demo-generic-output \
   --summary --group-by set,tissue
 ```
 
-For a real HOMER output, use `--input /path/to/knownResults.txt` with `--input-format homer-known`. A default `q < 0.05` threshold applies to **summaries only**; the program does not recalculate P/q values.
+> **Windows PowerShell:** the examples above use Unix-style `\` line continuation. Paste each command as one line in PowerShell, or use its backtick continuation character. The `examples/` data are synthetic.
+
+The CLI accepts `--input-format auto` (default), `homer-known`, or `generic-tsv`, and optional `--motif-column` and `--q-column` overrides. Use a new `--outdir` each time; existing output files are not replaced unless `--overwrite` is explicitly requested. The strict criterion for summary inclusion is **input q < threshold**, with a default threshold of `0.05`. The tool does **not** recompute q-values, P-values, or motif-enrichment statistics.
 
 ## Inputs
 
-| Item | Required | Meaning |
+| Input | Role | Interpretation |
 | --- | --- | --- |
-| HOMER `knownResults.txt` or generic TSV | Yes | Motif names; q-value column needed for `--summary` |
-| `--rules` TSV | No | Overrides shipped **provisional** name-pattern rules |
-| `--curated` TSV | No | User overrides, treated as requiring review |
-| `--reference-table` TSV | No | Offline user reference comparison; validity NOT independently confirmed |
+| HOMER `knownResults.txt` (TSV) | Main input | Existing motif names and reported statistics |
+| Generic TSV | Alternative main input | User-selected motif-name and optional q-value/grouping columns |
+| `homer_audit/rules.tsv` (or `--rules`) | 34 provisional lexical rules | Reporting heuristics; **not** validated native TF-family assignments |
+| `homer_audit/reference_name_rules_v04.tsv` | Bundled restricted reference | 10 rules; 21 explicitly permitted TF names linked to JASPAR 2026 class/family metadata |
+| `--curated` | Optional user mapping | A user-supplied override; remains subject to review |
+| `--reference-table` | Optional local reference comparison | Checks matches/conflicts; the program does **not** authenticate the reference |
 
-The built-in mapping file `homer_audit/reference_name_rules_v04.tsv` is a **restricted, frozen name-metadata lookup**, containing exactly 10 narrowly defined rules and exact TF symbol allowlists. It is not the complete JASPAR database. It should not be generalized to unlisted TF names.
+The reference-name crosswalk is intentionally restricted to listed symbols, not all members of a TF family. The matrix IDs supplied in the crosswalk are provenance identifiers, **not** the result of software PWM matching.
 
 ## Outputs
 
-| Output | Purpose |
+| Output | Meaning |
 | --- | --- |
-| `annotated.tsv` | Preserves input columns, appends name, provisional label, reference, risk and scientific-claim fields |
-| `summary.tsv` | **Legacy provisional** `family_label` counts for significant motif records |
-| `summary_evidence.tsv` | Evidence-scope, label-level and review-action grouped counts |
-| `summary_restricted_name_metadata.tsv` | Significant records with restricted TF-name metadata support; **not PWM validation** |
-| `audit.json` | Input/rules/reference SHA256s, software version, counters and interpretation caveats |
-| `reference_comparison.tsv` | Optional: comparison with a user-supplied reference table |
+| `annotated.tsv` | Input rows plus name-derived labels, native reference metadata (when allowed), semantic levels, review flags, and scientific-claim limitations |
+| `summary.tsv` | Counts by **legacy provisional** `family_label` at the supplied q-value threshold; not a confirmed TF-family count |
+| `summary_evidence.tsv` | Significant-record counts grouped by evidence scope, semantic category, and review action |
+| `summary_restricted_name_metadata.tsv` | Significant-record counts in the restricted TF-name metadata crosswalk; not PWM-matched motifs |
+| `audit.json` | Version, input/rules/reference file SHA256 hashes, counts, and interpretation warnings |
+| `reference_comparison.tsv` | Additional output when `--reference-table` is provided |
 
-In `annotated.tsv`, `family_label` is **a provisional legacy display field**. Prefer `v03_label_level`, `v03_claim_disposition`, `v03_metadata_evidence_scope`, `v03_review_action`, `v03_reference_name_supported`, and the original `v03_reference_tf_class`/`v03_reference_tf_family` fields for interpretation. `v03_family_claim_validated` is always `FALSE`. A record with `v03_review_required=FALSE` is **not** biologically approved.
+`summary*` files are emitted only when `--summary` is specified. Outputs count **HOMER table records**, not independent TFs, independent experiments, validated DNA-binding events, or biological family enrichments.
 
-### Special cases
+For interpretation, inspect `v03_label_level`, `v03_claim_disposition`, `v03_metadata_evidence_scope`, `v03_reference_name_supported`, `v03_review_action`, `v03_reference_tf_class`, and `v03_reference_tf_family`. The legacy `family_label` is provisional. `v03_family_claim_validated` remains `FALSE`; `v03_review_required=FALSE` does **not** confer biological approval.
 
-Generic `ETS`, `AP-1`, `NFY` and held member exceptions (including BATF), compound/dimer names, and fusion/chimeric labels receive conservative review/claim dispositions. CTCF is a TF symbol, but its name alone does not prove binding.
+### Conservative handling of ambiguous labels
 
-## Testing
+The classifier explicitly flags composite/dimer names, fusion/chimeric models, broad `ETS`, generic `AP-1`, multicomponent `NF-Y`, and specified member exceptions including `ATF2`, `ATF3`, `ATF6`, and `BATF`. `CTCF` is treated as a specific name, **not** evidence of TF occupancy. A user-provided reference disagreement requires review.
+
+## Classification methodology and sources
+
+The **implemented workflow**, complete 10-rule name crosswalk, symbol allowlists, examples, provenance, caveats, and references are documented in:
+
+**[Methods and references — `docs/METHODS_AND_REFERENCES.md`](docs/METHODS_AND_REFERENCES.md)**
+
+The three primary background/source publications are:
+
+1. Heinz S, et al. (2010). *Simple combinations of lineage-determining transcription factors prime cis-regulatory elements required for macrophage and B cell identities.* **Molecular Cell**, 38:576–589. https://doi.org/10.1016/j.molcel.2010.05.004 — HOMER/motif-analysis context, **not** the source of this utility's custom lexical rule table.
+2. Ovek Baydar D, et al. (2026). *JASPAR 2026: expansion of transcription factor binding profiles and integration of deep learning models.* **Nucleic Acids Research**, 54(D1):D184–D193. https://doi.org/10.1093/nar/gkaf1209 — **actual metadata source**, used as a restricted curated subset.
+3. Wingender E, Schoeps T, Dönitz J. (2013). *TFClass: an expandable hierarchical classification of human transcription factors.* **Nucleic Acids Research**, 41(D1):D165–D170. https://doi.org/10.1093/nar/gks1123 — conceptual hierarchical-classification reference; the program **does not** execute or directly query TFClass.
+
+See also [scientific scope](docs/SCIENCE_SCOPE.md), [validation and publicly pinned test sources](docs/VALIDATION.md), and [JASPAR attribution and changes](NOTICE-JASPAR.md).
+
+## Verification
+
+Run the included offline unit tests:
 
 ```bash
-python3 -B -m unittest discover -s tests -q
+python -B -m unittest discover -s tests -q
 ```
 
-The independently published source-table software regression test is optional and uses **user-supplied local copies** of three public, Git-blob-pinned HOMER tables. It does not fetch data:
+Before this documentation/workflow update, RC2 passed 61 local unit tests and software regressions using three separately obtained, Git-blob-pinned public HOMER tables (1,168 records; 46 restricted name-metadata hits, 21 with input q < 0.05; 758 records flagged for review). These are **software regression observations, not sensitivity/specificity estimates or independent biological verification**. Public tables can reuse the same HOMER motif dictionary. The actual tables are **not bundled**. Reproduce those tests with user-obtained local copies as described in [VALIDATION](docs/VALIDATION.md).
 
-```bash
-python3 -B scripts/validate_public_homer_offline.py \
-  --source-dir /path/to/public_sources \
-  --outdir /path/to/new_integration_output
-```
+## Relationship to other tools
 
-See [validation scope and source links](docs/VALIDATION.md) and [scientific limitations](docs/SCIENCE_SCOPE.md).
+HOMER performs motif discovery/enrichment; tools such as MEME Suite Tomtom and GimmeMotifs can compare motif matrices. **This utility does neither.** It audits downstream *reported names*, reference metadata and review dispositions. Where PWM-level identity matters, use an appropriate sequence/matrix-comparison method separately.
 
-## Similar tools and scope
+## License and attribution
 
-HOMER already performs enrichment analysis; GimmeMotifs, MEME Suite Tomtom, and RSAT matrix-clustering perform motif comparisons and/or clustering. This tool instead focuses on **auditing downstream textual name labels and metadata provenance**, without running PWM comparisons. It is not a substitute for those packages.
+Original code: **MIT License**, see [`LICENSE`](LICENSE). The bundled **adapted JASPAR 2026 metadata** have separate **CC BY 4.0** attribution and modification notices in [`NOTICE-JASPAR.md`](NOTICE-JASPAR.md). The MIT software license does not supersede the JASPAR data terms. No HOMER executable, HOMER motif library, JASPAR PWM collection, public external HOMER tables, or unpublished experiment-specific datasets are bundled.
 
-## License, attribution and publication status
-
-The author has declared independent authorship of this source code and has chosen the MIT License for the original software. The root [`LICENSE`](LICENSE) contains the author's selected public copyright holder identification. This declaration is not an independent legal verification of authorship.
-
-The adapted JASPAR 2026 reference-name crosswalk is separately attributed in [NOTICE-JASPAR.md](NOTICE-JASPAR.md) under the upstream CC BY 4.0 terms. Code licensing does not override upstream database attribution. See [release checklist](docs/RELEASE_CHECKLIST.md) and [license decision](docs/LICENSE_DECISION.md).
-
-**Not yet approved for a public GitHub upload.** The MIT license has been generated, but final inspection, clean Git staging/history review, and explicit owner release approval remain outstanding. This tree contains no intentionally bundled experimental data, server automation, downloaded public HOMER results or internal comparison code.
+This is a release-candidate research utility; users are responsible for interpreting results within the stated scientific limits.
