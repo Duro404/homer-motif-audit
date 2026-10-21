@@ -37,6 +37,8 @@ The following table is transcribed from the distributed `homer_audit/reference_n
 
 The broader TFClass framework explains the hierarchical interpretation of TF DNA-binding-domain classes and families [3]. **TFClass was used for classification background, not directly queried by this version of the program.** The JASPAR mapping is not independent corroboration from TFClass.
 
+Name-normalization boundary: The C/EBP spelling is preserved during motif-name parsing but is not automatically normalized to an eligible CEBP gene symbol. For example, C/EBPA may receive a provisional CEBP-related reporting label, but it does not qualify for the restricted JASPAR name crosswalk unless its parsed TF symbol exactly matches an explicitly allowed symbol, such as CEBPA. A provisional reporting label must not be interpreted as reference-supported TF-family metadata.
+
 ## 4. Ambiguous or withheld annotations
 
 | Example name/model pattern | Conservative handling | Reason |
@@ -57,7 +59,7 @@ The broader TFClass framework explains the hierarchical interpretation of TF DNA
 - RC2 passed **61** local unit tests and a three-dataset software regression on publicly available full-column HOMER result tables (**1,168** motif records; **46** restricted name-metadata hits; **21** of the 46 at reported input `q < 0.05`; **758** records flagged for review). Further validation was performed on an independent GitHub Actions environment running Python 3.10 and 3.12. These numbers describe observed program behavior, **not** a family-classification accuracy rate.
 - The three external HOMER outputs may contain the same known-motif library vocabulary; they should **not** be counted as three independent biological ground-truth evaluations.
 - Real external test tables are not redistributed. Fixed source commits and Git blob SHA1 identifiers, and instructions for reproducing the offline integration test, are in [`VALIDATION.md`](VALIDATION.md).
-- No held-out experimental PWM matching, TFChIP binding validation, sensitivity/specificity or direct family assignment benchmark was performed. The 10 rules do not license applying the mappings to unlisted TFs.
+- No held-out experimental PWM matching, TF ChIP-seq-based occupancy validation, sensitivity/specificity assessment, or direct family-assignment benchmark was performed. The 10 rules do not license applying the mappings to unlisted TFs.
 - For publication-grade biological claims, supplement any textual labels with domain-specific review and/or validated PWM comparison and biological evidence as appropriate.
 
 ## 6. References and role in this software
