@@ -1,0 +1,6 @@
+Motif Name	Consensus	P-value	Log P-value	q-value (Benjamini)	# of Target Sequences with Motif	% of Target Sequences with Motif	# of Background Sequences with Motif	% of Background Sequences with Motif
+FOXA1(Forkhead)/Synthetic-ChIP-Seq	TGTTTAC	1e-6	-13.8	0.001	12.0	15.00%	2.0	1.00%
+AP-1(bZIP)/PU.1-Synthetic-Source	TGACTCA	1e-5	-11.5	0.010	8.0	10.00%	1.0	0.50%
+ATF6(bZIP)/Synthetic-Source	TGACGTCA	1e-4	-9.2	0.050	4.0	5.00%	2.0	1.00%
+C/EBPG(bZIP)/Synthetic-Source	ATTGCGCAAT	1e-4	-9.2	0.020	5.0	6.25%	2.0	1.00%
+FOXA1:AR(Forkhead,NR)/Synthetic-Source	TGTTTAC	1e-3	-6.9	0.025	6.0	7.50%	3.0	1.50%

@@ -1,0 +1,35 @@
+rule_id	stage	regex	family	review_required	note
+NON_TF_SPLICE	head	^(?:SPLICEDONOR|SPLICEACCEPTOR|U1SNRNP)(?:[0-9]*)$	Splice-site/non-TF	false	Not a TF assignment
+NON_TF_RBP	head	^(?:CELF[0-9]*|RBFOX[0-9]*|HNRNP[A-Z0-9]*|SRSF[0-9]*|PTBP[0-9]*|FUS|FUBP[0-9]*|ELAV[A-Z0-9]*)$	RNA-binding/non-TF	false	Not a TF assignment
+COMP_ETS_RUNX	head	^(?:ETS:RUNX|RUNX:ETS)(?:[0-9]*)$	Composite ETS/RUNX	true	Composite motif, manual review
+COMP_NFAT_AP1	head	^(?:NFAT:AP-?1|AP-?1:NFAT)$	Composite NFAT/AP-1	true	Composite motif, manual review
+MEF2	head	^MEF2[A-Z0-9]*$	MEF2/MADS	false	Gene-name heuristic
+SRF	head	^SRF$	SRF/MADS	false	Gene-name heuristic
+TBOX	head	^(?:TBX[0-9]+|TBR[0-9]*|EOMES|TBET)$	T-box	false	Gene-name heuristic
+CEBP	head	^(?:C/?EBP[A-Z0-9]*|CEBP[A-Z0-9]*)$	CEBP/bZIP	false	Gene-name heuristic
+AP1	head	^(?:AP-?1|JUN[A-Z0-9]*|FOS[A-Z0-9]*|FRA[0-9]+|BATF[0-9]*|JDP[0-9]*)$	AP-1/bZIP	false	AP-1 related name heuristic
+ATF_AMBIGUOUS	head	^ATF[0-9]*$	Other bZIP	true	ATF names alone do not prove AP-1 membership
+BHLH	head	^(?:MYOD[0-9]*|MYOG|MYF[0-9]+|NEUROD[0-9]*|ASCL[0-9]*|TWIST[0-9]*|TCF[0-9]+|BMAL[0-9]*|CLOCK|MAX|MYC|MITF|E2A)$	bHLH/E-box	false	Gene-name heuristic
+TEAD	head	^TEAD[0-9]*$	TEAD	false	Gene-name heuristic
+ETS	head	^(?:ETS[0-9]*|ERG|FLI[0-9]*|ELF[0-9]*|ELK[0-9]*|ETV[0-9]*|GABPA|SPI[0-9]*|PU\.1|SPDEF|EWS:(?:FLI[0-9]*|ERG))$	ETS	false	Gene-name heuristic
+RUNX	head	^RUNX[0-9]*$	RUNX	false	Gene-name heuristic
+KLF_SP	head	^(?:KLF[0-9]+|SP[1-9][0-9]*)$	KLF/SP	false	Gene-name heuristic
+HOMEOBOX	head	^(?:HOX[A-Z0-9]*|SIX[0-9]+|PAX[0-9]+|MEIS[0-9]*|PBX[0-9]*|LHX[0-9]*|DLX[0-9]*|NKX[0-9.-]*|CDX[0-9]*|MSX[0-9]*)$	Homeobox	false	Gene-name heuristic
+FOX	head	^FOX[A-Z0-9]*$	FOX	false	Gene-name heuristic
+GATA	head	^GATA[0-9]+$	GATA	false	Gene-name heuristic
+SOX	head	^SOX[0-9]+$	SOX	false	Gene-name heuristic
+CTCF	head	^CTCF$	CTCF	false	Gene-name heuristic
+NFY	head	^NF-?Y[A-Z0-9]*$	NFY	false	Gene-name heuristic
+SMAD	head	^SMAD[0-9]+$	SMAD	false	Gene-name heuristic
+NR	head	^(?:AR|PGR|NR[0-9][A-Z0-9]*|RXR[A-Z0-9]*|RAR[A-Z0-9]*|PPAR[A-Z0-9]*|THRB|ESR[0-9]*|NR3C[0-9]*)$	Nuclear receptor	false	Gene-name heuristic
+TAG_RRM	tag	^(?:RRM|RBD)$	RNA-binding/non-TF	true	Based only on parenthetical tag
+TAG_BHLH	tag	^(?:BHLH|HLH)$	bHLH/E-box	true	Based only on parenthetical tag
+TAG_BZIP	tag	^BZIP$	Other bZIP	true	Based only on parenthetical tag
+TAG_MADS	tag	^MADS$	MADS-like	true	MADS tag alone not sufficient for subfamily
+TAG_TBOX	tag	^(?:T-BOX|TBOX)$	T-box	true	Based only on parenthetical tag
+TAG_NR	tag	^(?:NR|NUCLEAR RECEPTOR)$	Nuclear receptor	true	Based only on parenthetical tag
+TAG_ETS	tag	^ETS$	ETS	true	Based only on parenthetical tag
+TAG_RUNT	tag	^RUNT$	RUNX	true	Based only on parenthetical tag
+TAG_HOMEOBOX	tag	^HOMEOBOX$	Homeobox	true	Based only on parenthetical tag
+TAG_FORKHEAD	tag	^FORKHEAD$	FOX	true	Based only on parenthetical tag
+TAG_HMG	tag	^HMG$	SOX/HMG	true	HMG tag not uniquely SOX

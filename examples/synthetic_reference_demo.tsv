@@ -1,0 +1,4 @@
+motif_core	reference_family_label	native_tf_family	source_database	source_release	source_record_id	mapping_status	evidence_link	mapping_note
+FOXA1(Forkhead)	FOX	Demo Forkhead	SYNTHETIC_TEST_ONLY	DEMO	FAKE_001	pending	NOT_A_REAL_DATABASE_LINK	Fabricated testing row; NOT external validation
+ATF6(bZIP)	AP-1/bZIP	Demo ZIP	SYNTHETIC_TEST_ONLY	DEMO	FAKE_002	approved	NOT_A_REAL_DATABASE_LINK	Simulated reviewed status only; NOT scientifically adjudicated
+C/EBPG(bZIP)	CEBP/bZIP	Demo CEBP	SYNTHETIC_TEST_ONLY	DEMO	FAKE_003	approved	NOT_A_REAL_DATABASE_LINK	Simulated reviewed status only; NOT scientifically adjudicated
